@@ -15,3 +15,4 @@ jobs:
         with: {repository: kvnloo/home, token: '${{ secrets.MIRROR_TOKEN }}', path: .home, sparse-checkout: tools/fork-standard, persist-credentials: false}
       - run: .home/tools/fork-standard/scripts/run-mirror.sh
         env: {UPSTREAM: 'bramstroker/homeassistant-powercalc', FORK: 'kvnloo/homeassistant-powercalc', BRANCH: 'master', MIRROR_TOKEN: '${{ secrets.MIRROR_TOKEN }}'}
+# registered: 2026-11-24T23:35:33Z (editing this file makes GitHub register the workflow)
