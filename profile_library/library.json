@@ -3828,6 +3828,66 @@
       ]
     },
     {
+      "aliases": [
+        "Canon Inc."
+      ],
+      "name": "canon",
+      "full_name": "Canon",
+      "dir_name": "canon",
+      "website": "https://www.canon.de",
+      "country": "JP",
+      "description": "Japanese manufacturer of printers, cameras and imaging products.",
+      "models": [
+        {
+          "name": "PIXMA TS5050",
+          "description": "Inkjet printer, measured on a PIXMA TS5050. Other units in the series report the same \"TS5000 series\" model over IPP.",
+          "device_type": "printer",
+          "calculation_strategy": "fixed",
+          "aliases": [
+            "TS5000 series"
+          ],
+          "discovery_by": "device",
+          "compatible_integrations": [
+            "ipp"
+          ],
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "usb"
+            ]
+          },
+          "measure_method": "script",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_description": "Measured on a PIXMA TS5050 (GTIN 4549292066517). IPP only reports \"TS5000 series\", so the profile lives under the measured model id and keeps \"TS5000 series\" as its discovery alias \u2014 other printers in the series therefore use this profile too. Created from a Powercalc Measure recording (measure app 0.14.3, Shelly Plug S Gen3, 230 V): one run over 64 minutes with 1857 samples, 1712 idle and 56 printing. Idle shows two reachable levels (about 1.1 W in deep sleep, about 3.7 W awake on WiFi), so the energy-weighted average is used. Printing averages 10.8 W (median 11.6 W, peak 19.2 W).",
+          "mains_voltage": 230,
+          "created_at": "2026-11-20T00:00:00Z",
+          "authors": [
+            {
+              "name": "Maximilian Kraus",
+              "github": "Maxik933"
+            }
+          ],
+          "gtin": [
+            "4549292066517"
+          ],
+          "product_url": "https://www.canon.de/printers/pixma-ts5050-series/specifications/",
+          "id": "TS5050",
+          "manufacturer": "canon",
+          "updated_at": "2026-11-23T11:09:08",
+          "max_power": 10.8,
+          "sub_profile_count": 0,
+          "power_range": {
+            "min": 2.15,
+            "max": 10.8
+          },
+          "hash": "3091f967c1b6945a24b37aadfa136060"
+        }
+      ],
+      "device_types": [
+        "printer"
+      ]
+    },
+    {
       "aliases": [],
       "name": "casalux",
       "full_name": "Casalux",
@@ -4108,6 +4168,48 @@
       "country": "CN",
       "description": "Chinese home-appliance company known for robotic vacuums and other smart cleaning devices.",
       "models": [
+        {
+          "aliases": [
+            "dreame.vacuum.r2427a"
+          ],
+          "authors": [
+            {
+              "github": "Maxik933",
+              "name": "Maxik933"
+            }
+          ],
+          "calculation_strategy": "composite",
+          "compatible_integrations": [
+            "dreame_vacuum"
+          ],
+          "created_at": "2026-11-16T00:19:55Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi"
+            ]
+          },
+          "device_type": "vacuum_robot",
+          "mains_voltage": 230,
+          "measure_description": "Measured on a Mova E30 Ultra (robot model RLE51SE, dock model RCEE0301; Home Assistant model dreame.vacuum.r2427a) through the dreame_vacuum integration with a Shelly Plug S Gen3 between the wall socket and the base station, so every value covers the whole station rather than the robot alone. All values are time averages over the window in which the matching condition holds, not peak values.\n\nRecordings:\n- 6.33 h run covering a full clean from 100 % down to 15 %, mop washing and drying cycles, and a charge from 15 % to 99 % (the 18\u201373 % part ran while mop drying was active).\n- 25.2 min run covering charge completion at 99\u2013100 % and the first 13 minutes of the post-charge tail.\n- Two dock-only runs of 3.1 and 2.4 minutes at 100 %, used to confirm the settled docked level.\n\nCoverage:\n- Away from the dock (cleaning, returning, paused): 0.37 W, from 4,206 samples between 0.13 and 0.86 W.\n- Auto-empty: auto_empty_status is active for only about 6 to 17 s per cycle. The plateau inside that window is 540 to 576 W, but the average over the complete active interval (47 samples, 98 s) is 414.5 W, which is the interval the condition actually spans, so the ramp-up is included instead of being reported as a peak.\n- Washing: 19.4 W, from 966 samples. The base draws this while charging is also flagged on, so the charging branch is not added on top.\n- Drying while charging: 36.9 W, from 2,297 samples. This is the total outlet power, not charging plus drying added together.\n- Drying after charging finished: 6.3 W, from 98 samples.\n- Docked idle: 14.6 W for the roughly 10 minutes after a charge while status is idle (752 samples).\n- Docked and settled: 2.8 W. The two dock-only runs confirm it (2.83 W and 2.78 W).\n- Charging: one calibration point per battery level from 15 to 17 % and 74 to 99 % (2,150 samples). The 93 to 99 % taper is modelled per level. 18 to 73 % was only recorded while mop drying ran, so it is interpolated flat between the 17 % (33.48 W) and 74 % (33.29 W) points; 0 to 14 % is a flat estimate at the 15 % value (32.83 W).\n\nWhole-run energy: over all four recordings the measured consumption is 123.16 Wh, while the profile predicts 119.86 Wh, an underestimate of 2.68 %. Most of that difference comes from the unmodelled sleeping decay described below.\n\nLimitations:\n- The first 30 minutes after a charge are not modelled separately. Once status changes from idle to sleeping, the station still decays from about 17 W to 2.8 W over roughly 30 minutes (mean 9.2 W). The profile reports the settled 2.8 W there instead, so each completed charge is under-counted by about 3.2 Wh. Modelling the decay would require a time template on charging_state.last_changed, which restarts on every Home Assistant restart or unavailable-to-off transition and would then overstate power for a full window, so the settled value is used on purpose.\n- The transition at 100 % is therefore not distinguished either: the charging branch stops at 99 %, and the short period at 100 % falls into the idle or docked branch.\n- Charging below 15 % and between 18 and 73 % is a flat interpolation and not measured in isolation.\n- The auto-empty per-sample MAE is large because a 6 to 17 s ramp is represented by one average. Integrated over all episodes the branch matches almost exactly (11.28 Wh measured against 11.28 Wh modelled).\n- All values were recorded at a single mains voltage around 230 V.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.1:app"
+          },
+          "min_version": "v1.25.5",
+          "name": "E30 Ultra Robot Vacuum Cleaner",
+          "product_url": "https://mova.tech/products/mova-e30-ultra-robot-vacuum",
+          "standby_power": 2.8,
+          "id": "RLE51SE",
+          "manufacturer": "dreame",
+          "updated_at": "2026-11-25T07:25:52",
+          "max_power": null,
+          "sub_profile_count": 0,
+          "hash": "f686be6d0a2970e213b0bb5dce6d28d6"
+        },
         {
           "aliases": [
             "dreame.vacuum.r2205"
@@ -8479,6 +8581,67 @@
           "max_power": 0,
           "sub_profile_count": 0,
           "hash": "46f37b5be292cb15df527c1d2a2c3d75"
+        },
+        {
+          "authors": [
+            {
+              "github": "turmacar",
+              "name": "turmacar"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-26T23:15:37Z",
+          "device_specs": {
+            "connectivity": [
+              "wifi",
+              "bluetooth"
+            ],
+            "form_factor": "bulb",
+            "lumens": 800,
+            "rated_power": 9,
+            "socket": "E26"
+          },
+          "device_type": "light",
+          "gtin": [
+            "850061998576"
+          ],
+          "mains_voltage": 120,
+          "measure_description": "Measured with Powercalc Measure, two bulbs in parallel behind one meter",
+          "measure_device": "Zooz Z-Wave Plus Power Switch ZEN15",
+          "measure_device_firmware": "2.40.0",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 2,
+            "SAMPLE_COUNT": 3,
+            "SLEEP_TIME": 6.0,
+            "VERSION": "master"
+          },
+          "name": "RGBWW Smart LED Bulb A19",
+          "standby_power": 0.46,
+          "voltage_range": {
+            "max": 125.93,
+            "min": 121.08
+          },
+          "id": "H6004",
+          "manufacturer": "govee",
+          "updated_at": "2026-11-27T18:00:26",
+          "max_power": 9.27,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-27T18:00:26",
+          "power_range": {
+            "min": 0.54,
+            "max": 9.27
+          },
+          "color_modes": [
+            "color_temp",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.9,
+            "color_temp": 98.9
+          },
+          "hash": "721297fa952174cc3feed499bc3758b0"
         },
         {
           "calculation_strategy": "lut",
@@ -16578,6 +16741,68 @@
           "hash": "e8ea596a9ec4e226dc016a2f4012625d"
         },
         {
+          "aliases": [
+            "2711"
+          ],
+          "authors": [
+            {
+              "email": "me@akashihi.org",
+              "github": "akashihi",
+              "name": "akashihi"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-23T09:54:33Z",
+          "device_specs": {
+            "connectivity": [
+              "matter",
+              "wifi"
+            ],
+            "lumens": 1521,
+            "rated_power": 14,
+            "socket": "E27"
+          },
+          "device_type": "light",
+          "gtin": [
+            "4099854528835"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Power Strip 4 Gen4",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": false,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 1,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.3:app"
+          },
+          "name": "SMART+ Matter Classic A100 E27 TW",
+          "standby_power": 0.28,
+          "voltage_range": {
+            "max": 235.1,
+            "min": 229.5
+          },
+          "id": "AC73907",
+          "manufacturer": "ledvance",
+          "updated_at": "2026-11-24T08:00:35",
+          "max_power": 15.0,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-23T11:14:33",
+          "power_range": {
+            "min": 3.1,
+            "max": 15.0
+          },
+          "color_modes": [
+            "color_temp"
+          ],
+          "lut_quality": {
+            "score": 98.8,
+            "color_temp": 98.8
+          },
+          "hash": "898d5fe9a94f2b5ac3011400e70a1d4a"
+        },
+        {
           "gtin": [
             "4099854461330"
           ],
@@ -23304,9 +23529,9 @@
           "standby_power": 0.3,
           "measure_method": "manual",
           "measure_device": "ThirdReality 3RSP02064Z",
-          "measure_description": "Whole dock + robot measured at the wall with a ThirdReality Gen3 plug (2 s / 3 W power reporting, 1 Wh energy counter) over Oct 20-26 2026 runs and manual washes; activity energies cross-checked against the plug's energy counter. Activities come from the dock's dust_emptying, mop_washing and mop_drying switches and the robot's status and battery. Sub-profiles match the dock's mop wash temperature setting: hot, warm and room_temperature. Branch values are total wall power: 0.3 W with the robot away (dock alone), 3.5 W with the robot docked at 100%. Charging is mapped from battery % using a clean slow-mode charge (Oct 24, 14% to 100%, washing and drying off): 23 W at the wall rising to 26.6 W near 85-91%, then tapering to ~16 W above ~92%. Mop drying measured at the wall over a 2 h drying-only run at 100% battery. Charging limitations: Smart Charging sometimes runs a 40-50 W fast mode for part of a charge. The table follows slow mode, so fast-mode charges will be underestimated (-13% for a full run with drying; -43% for a fast mid-run recharge; -4.0% across all measured charges). Charging continues for ~5 min at ~15 W after the battery reports 100%, and there is a ~10 min ~10 W pause before charging from very low battery; neither are modeled. Robot label: model S91COP, product ID S10R51-01, rated input 20 V / 2.5 A. Dock label: model EWFD28LRR, rated input 120 V 60 Hz (charging & drying 1.4 A, hot-water mop washing 12 A, dust collection 6 A). US 120 V supply.",
+          "measure_description": "Dock and robot measured together at the wall. Charging uses battery_rate at 1.00 Wh per battery %, so it follows both slow and fast charging; over eight, charging energy came within 1% of the plug's energy counter. Mop drying adds 56.2 W to the 3.5 W docked baseline. Robot: S91COP, 20 V 2.5 A. Dock: EWFD28LRR, 120 V 60 Hz.",
           "mains_voltage": 120,
-          "min_version": "v1.26.0",
+          "min_version": "v1.27.1",
           "product_url": "https://global.roborock.com/pages/roborock-saros-10r",
           "created_at": "2026-10-25T00:00:00Z",
           "authors": [
@@ -23317,10 +23542,10 @@
           ],
           "id": "S10R51-01",
           "manufacturer": "roborock",
-          "updated_at": "2026-10-31T18:47:32",
+          "updated_at": "2026-11-26T09:05:20",
           "max_power": null,
           "sub_profile_count": 3,
-          "hash": "8c9a33bd685ee64af194aa38d2ca638d"
+          "hash": "4316afe59912f0175c094937b1e4f9d8"
         },
         {
           "aliases": [
@@ -24359,6 +24584,61 @@
         },
         {
           "aliases": [
+            "Shelly 1PM Gen4"
+          ],
+          "calculation_strategy": "fixed",
+          "description": "Compact Smart Wi-Fi Relay with Power Monitoring",
+          "discovery_by": "device",
+          "created_at": "2026-11-25T22:30:00Z",
+          "device_type": "smart_switch",
+          "device_specs": {
+            "form_factor": "in_wall",
+            "max_load_watts": 3680,
+            "power_monitoring": true,
+            "rated_power": 1.0,
+            "connectivity": [
+              "wifi",
+              "bluetooth",
+              "matter",
+              "zigbee",
+              "knx"
+            ]
+          },
+          "gtin": [
+            "3800238070717",
+            "3800238070724",
+            "3800238070731"
+          ],
+          "measure_description": "Measured with 33.7 W dummy load, averaged over 300 seconds. Multiple combinations of settings were tested. Firmware version 2.1.1.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
+          "mains_voltage": 230,
+          "measure_settings": {
+            "VERSION": "v0.14.3:app"
+          },
+          "name": "1PM Gen4",
+          "only_self_usage": true,
+          "product_url": "https://www.shelly.com/products/shelly-1pm-gen4",
+          "authors": [
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
+            }
+          ],
+          "id": "S4SW-001P16EU",
+          "manufacturer": "shelly",
+          "updated_at": "2026-11-27T10:45:35",
+          "max_power": 0.84,
+          "sub_profile_count": 4,
+          "power_range": {
+            "min": 0.29,
+            "max": 0.84
+          },
+          "standby_power": 0.59,
+          "hash": "6bdc06380f52c0aeb4386c00506c839f"
+        },
+        {
+          "aliases": [
             "Shelly 1PM Mini Gen4",
             "Shelly Mini1PMG4"
           ],
@@ -25089,6 +25369,7 @@
           "hash": "c48e1acb0fce2e23e8671badb0bd3825"
         },
         {
+          "name": "Plus Plug S",
           "aliases": [
             "Shelly Plus Plug S",
             "Shelly Plus Plug S V2",
@@ -25098,8 +25379,8 @@
             "shelly plus plug s"
           ],
           "calculation_strategy": "fixed",
-          "description": "Smart Wi-Fi Plug with Power Monitoring",
           "created_at": "2024-12-01T18:36:00Z",
+          "description": "Smart Wi-Fi Plug with Power Monitoring",
           "device_type": "smart_switch",
           "device_specs": {
             "form_factor": "plug",
@@ -25110,36 +25391,39 @@
               "bluetooth"
             ]
           },
+          "discovery_by": "entity",
           "gtin": [
             "3800235265628"
           ],
-          "discovery_by": "entity",
-          "measure_description": "Manually measured. (LED off). Transcribed from https://www.youtube.com/watch?v=cLtao6yG7ds. V2 added to V1 since the manufacturer doesn't mention other changes than mechanical",
-          "measure_device": "GW Instek GPM-8310",
-          "measure_method": "manual",
           "mains_voltage": 230,
-          "name": "Plus Plug S",
+          "measure_description": "Two measurement setups are combined in this profile.\n\nThe root `standby_power` (0.74 W) and `standby_power_on` (1.01 W) are the original values: manually measured with a GW Instek GPM-8310, LED off, and transcribed from https://www.youtube.com/watch?v=cLtao6yG7ds. V2 was added to V1 because the manufacturer does not mention changes other than mechanical. They are kept unchanged for existing installations until a sub-profile is selected; the `measure_device` field names the meter used for the eight sub-profiles below.\n\nThe eight sub-profiles were measured with a Shelly Plug S Gen3: the plug under test and a calibrated resistive dummy load are connected in parallel to the same mains input, and the Shelly measures upstream of both. The dummy load is never connected to the relay output, so the reference meter always sees the plug plus the dummy load and can resolve the sub-watt self-consumption. Its contribution is subtracted per sample as V^2/R instead of a fixed offset, because it follows the mains voltage. The stored sub-profile values are time averages over the measurement window of each state, not peak values. Plug firmware version 1.7.6.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
           "only_self_usage": true,
-          "standby_power": 0.74,
-          "standby_power_on": 1.01,
           "product_url": "https://www.shelly.com/products/shelly-plus-plug-s-black-x1-2",
           "authors": [
             {
               "name": "RubenKelevra",
               "email": "cyrond@gmail.com",
               "github": "RubenKelevra"
+            },
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
             }
           ],
+          "standby_power": 0.74,
+          "standby_power_on": 1.01,
           "id": "SNPL-00112EU",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
-          "max_power": 1.01,
-          "sub_profile_count": 0,
+          "updated_at": "2026-11-25T07:49:18",
+          "max_power": 1.021,
+          "sub_profile_count": 8,
           "power_range": {
-            "min": 0.74,
-            "max": 1.01
+            "min": 0.133,
+            "max": 1.021
           },
-          "hash": "aea34b9f3ee43f8c667cb5241604167d"
+          "hash": "ab7ead7cac2408b3f4b676ace0be2cfe"
         },
         {
           "aliases": [
@@ -25181,10 +25465,11 @@
           ],
           "id": "SNPL-00116US",
           "manufacturer": "shelly",
-          "updated_at": "2026-09-13T09:41:49",
+          "updated_at": "2026-11-25T07:49:18",
           "max_power": 0,
-          "sub_profile_count": 0,
-          "hash": "36962335bd3f26a83f81322b66e71624"
+          "sub_profile_count": 8,
+          "standby_power": 0.606,
+          "hash": "e2ae74c2f18fd0fc23f21272cdb9e739"
         },
         {
           "aliases": [
@@ -30390,6 +30675,64 @@
             "color_temp": 97.3
           },
           "hash": "ffb95eb4e33700a1ee19d3b6e6e966d7"
+        },
+        {
+          "aliases": [
+            "929003853601"
+          ],
+          "authors": [
+            {
+              "github": "buttonger",
+              "name": "buttonger"
+            }
+          ],
+          "calculation_strategy": "lut",
+          "created_at": "2026-11-19T09:37:02Z",
+          "device_type": "light",
+          "gtin": [
+            "8720169364226"
+          ],
+          "mains_voltage": 230,
+          "measure_description": "Measured with Powercalc Measure",
+          "measure_device": "Shelly Plus Plug S Gen2",
+          "measure_device_firmware": "2.1.1",
+          "measure_method": "script",
+          "measure_settings": {
+            "DUMMY_LOAD": true,
+            "DUMMY_LOAD_POWER": 24.19,
+            "DUMMY_LOAD_RESISTANCE": 2210.66,
+            "NUM_LIGHTS": 1,
+            "SAMPLE_COUNT": 2,
+            "SLEEP_TIME": 2.0,
+            "VERSION": "v0.14.3:app"
+          },
+          "name": "Hue White and Color Ambiance A67 E27 1600 lm",
+          "product_url": "https://www.philips-hue.com/de-de/p/hue-white-color-ambiance-a67-smarte-lampe-e27-1600/8720169364226",
+          "standby_power": 0.37,
+          "voltage_range": {
+            "max": 235.1,
+            "min": 225.5
+          },
+          "id": "LCA022",
+          "manufacturer": "signify",
+          "updated_at": "2026-11-24T08:01:53",
+          "max_power": 11.82,
+          "sub_profile_count": 0,
+          "measurement_updated_at": "2026-11-19T11:17:00",
+          "power_range": {
+            "min": 0.35,
+            "max": 11.82
+          },
+          "color_modes": [
+            "color_temp",
+            "effect",
+            "hs"
+          ],
+          "lut_quality": {
+            "score": 98.2,
+            "color_temp": 98.2
+          },
+          "hash": "7250b364c19c82d55b443bc49fbbccda"
         },
         {
           "aliases": [
@@ -40324,6 +40667,7 @@
           "hash": "dd414447a1b35359673997c661db163a"
         },
         {
+          "name": "Plus Plug S",
           "aliases": [
             "Shelly Plus Plug S",
             "Shelly Plus Plug S V2",
@@ -40333,8 +40677,8 @@
             "shelly plus plug s"
           ],
           "calculation_strategy": "fixed",
-          "description": "Smart Wi-Fi Plug with Power Monitoring",
           "created_at": "2024-12-01T18:36:00Z",
+          "description": "Smart Wi-Fi Plug with Power Monitoring",
           "device_type": "smart_switch",
           "device_specs": {
             "form_factor": "plug",
@@ -40345,36 +40689,39 @@
               "bluetooth"
             ]
           },
+          "discovery_by": "entity",
           "gtin": [
             "3800235265628"
           ],
-          "discovery_by": "entity",
-          "measure_description": "Manually measured. (LED off). Transcribed from https://www.youtube.com/watch?v=cLtao6yG7ds. V2 added to V1 since the manufacturer doesn't mention other changes than mechanical",
-          "measure_device": "GW Instek GPM-8310",
-          "measure_method": "manual",
           "mains_voltage": 230,
-          "name": "Plus Plug S",
+          "measure_description": "Two measurement setups are combined in this profile.\n\nThe root `standby_power` (0.74 W) and `standby_power_on` (1.01 W) are the original values: manually measured with a GW Instek GPM-8310, LED off, and transcribed from https://www.youtube.com/watch?v=cLtao6yG7ds. V2 was added to V1 because the manufacturer does not mention changes other than mechanical. They are kept unchanged for existing installations until a sub-profile is selected; the `measure_device` field names the meter used for the eight sub-profiles below.\n\nThe eight sub-profiles were measured with a Shelly Plug S Gen3: the plug under test and a calibrated resistive dummy load are connected in parallel to the same mains input, and the Shelly measures upstream of both. The dummy load is never connected to the relay output, so the reference meter always sees the plug plus the dummy load and can resolve the sub-watt self-consumption. Its contribution is subtracted per sample as V^2/R instead of a fixed offset, because it follows the mains voltage. The stored sub-profile values are time averages over the measurement window of each state, not peak values. Plug firmware version 1.7.6.",
+          "measure_device": "Shelly Plug S Gen3",
+          "measure_method": "manual",
           "only_self_usage": true,
-          "standby_power": 0.74,
-          "standby_power_on": 1.01,
           "product_url": "https://www.shelly.com/products/shelly-plus-plug-s-black-x1-2",
           "authors": [
             {
               "name": "RubenKelevra",
               "email": "cyrond@gmail.com",
               "github": "RubenKelevra"
+            },
+            {
+              "name": "Maxik933",
+              "github": "Maxik933"
             }
           ],
+          "standby_power": 0.74,
+          "standby_power_on": 1.01,
           "id": "shelly plus plug s",
           "manufacturer": "tasmota",
           "updated_at": "2026-08-23T07:39:01",
-          "max_power": 1.01,
-          "sub_profile_count": 0,
+          "max_power": 1.021,
+          "sub_profile_count": 8,
           "power_range": {
-            "min": 0.74,
-            "max": 1.01
+            "min": 0.133,
+            "max": 1.021
           },
-          "hash": "0af275688bdc2f79bf8e66160c2eb343"
+          "hash": "0c13bbcbec8cb8b615107dcb8ba71051"
         }
       ],
       "device_types": [
